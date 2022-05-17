@@ -1,18 +1,14 @@
 import torchvision.transforms as T
 import numpy as np
-import cv2
 from PIL import Image
+from matplotlib import cm
 
-def visualize_depth(depth, cmap=cv2.COLORMAP_JET):
-    """
-    depth: (H, W)
-    """
+def visualize_depth(depth):
     x = depth.cpu().numpy()
     x = np.nan_to_num(x) # change nan to 0
     mi = np.min(x) # get minimum depth
     ma = np.max(x)
-    x = (x-mi)/(ma-mi+1e-8) # normalize to 0~1
-    x = (255*x).astype(np.uint8)
-    x_ = Image.fromarray(cv2.applyColorMap(x, cmap))
-    x_ = T.ToTensor()(x_) # (3, H, W)
+    x = (x - mi) / (ma - mi + 1e-8) # normalize to 0~1
+    x_ = Image.fromarray((cm.get_cmap('jet')(x) * 255).astype(np.uint8))
+    x_ = T.ToTensor()(x_)[:3, :, :]
     return x_

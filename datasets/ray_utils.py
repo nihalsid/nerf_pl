@@ -1,5 +1,11 @@
 import torch
-from kornia import create_meshgrid
+
+
+def create_grid(height, width):
+    xs = torch.linspace(0, width - 1, width)
+    ys = torch.linspace(0, height - 1, height)
+    i, j = torch.meshgrid(xs, ys, indexing='ij')
+    return i.t(), j.t()
 
 
 def get_ray_directions(H, W, focal):
@@ -14,8 +20,7 @@ def get_ray_directions(H, W, focal):
     Outputs:
         directions: (H, W, 3), the direction of the rays in camera coordinate
     """
-    grid = create_meshgrid(H, W, normalized_coordinates=False)[0]
-    i, j = grid.unbind(-1)
+    i, j = create_grid(H, W)
     # the direction here is without +0.5 pixel centering as calibration is not so accurate
     # see https://github.com/bmild/nerf/issues/24
     directions = \
